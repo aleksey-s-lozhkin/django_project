@@ -1,6 +1,5 @@
-from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.urls import reverse
+from django.shortcuts import redirect, render
 
 
 def home(request):
