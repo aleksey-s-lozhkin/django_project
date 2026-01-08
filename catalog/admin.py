@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Category
+from .models import Product, Category, Contact
 
 """
 Административная конфигурация для приложений каталога:
@@ -42,3 +42,24 @@ class AuthorAdmin(admin.ModelAdmin):
     list_display = ('id', 'name')
     list_filter = ('name',)
     search_fields = ('name',)
+
+
+@admin.register(Contact)
+class ContactAdmin(admin.ModelAdmin):
+    list_display = ('country', 'inn', 'phone', 'email', 'updated_at')
+    list_filter = ('country',)
+    search_fields = ('country', 'inn', 'phone', 'email')
+    readonly_fields = ('created_at', 'updated_at')
+
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('country', 'inn', 'address')
+        }),
+        ('Контактные данные', {
+            'fields': ('phone', 'email', 'schedule')
+        }),
+        ('Служебная информация', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
