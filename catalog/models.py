@@ -1,4 +1,5 @@
 from django.db import models
+
 """
 Модели приложения каталога.
 
@@ -45,6 +46,7 @@ class Contact(models.Model):
     """
     Модель для хранения контактных данных компании.
     """
+
     country = models.CharField(max_length=100, verbose_name='Страна', default='Cuba')
     inn = models.CharField(max_length=20, verbose_name='ИНН', default='91-1144442')
     address = models.TextField(verbose_name='Адрес', default='Matanzas, Varadero')

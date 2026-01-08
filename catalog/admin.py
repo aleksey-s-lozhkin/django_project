@@ -1,44 +1,35 @@
 from django.contrib import admin
-from .models import Product, Category, Contact
 
-"""
-Административная конфигурация для приложений каталога:
-- Регистрирует модели Product и Category в Django admin.
-- Настраивает отображение списков, фильтры и поля для поиска.
+from .models import Category, Contact, Product
 
-Каждый класс-настройка наследует от `admin.ModelAdmin` и определяет:
-- list_display: поля, отображаемые в таблице списка объектов.
-- list_filter: поля, доступные как фильтры в боковой панели.
-- search_fields: поля, по которым выполняется полнотекстовый поиск.
-"""
 
 @admin.register(Product)
-class AuthorAdmin(admin.ModelAdmin):
+class ProductAdmin(admin.ModelAdmin):
     """
-    Конфигурация админки для модели Product.
+    Административная конфигурация для модели Product (Продукт).
 
-    Атрибуты:
-    - list_display (tuple): Поля, отображаемые в списке записей админки.
-      Здесь отображаются идентификатор, название, цена и связанная категория.
-    - list_filter (tuple): Поля, по которым можно фильтровать список.
-      Позволяет фильтровать продукты по категории.
-    - search_fields (tuple): Поля, по которым выполняется поиск в интерфейсе админки.
-      Поиск выполняется по имени продукта и его описанию.
+    Настройки:
+    - list_display: поля, отображаемые в списке продуктов
+    - list_filter: фильтры для быстрой навигации по продуктам
+    - search_fields: поля для полнотекстового поиска
     """
+
     list_display = ('id', 'name', 'price', 'category')
     list_filter = ('category',)
     search_fields = ('name', 'description')
 
-@admin.register(Category)
-class AuthorAdmin(admin.ModelAdmin):
-    """
-    Конфигурация админки для модели Category.
 
-    Атрибуты:
-    - list_display (tuple): Поля, отображаемые в списке категорий (id и имя).
-    - list_filter (tuple): Поля для фильтрации списка категорий (по имени).
-    - search_fields (tuple): Поля, по которым выполняется поиск (по имени).
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
     """
+    Административная конфигурация для модели Category (Категория).
+
+    Настройки:
+    - list_display: поля, отображаемые в списке категорий
+    - list_filter: фильтры для категорий
+    - search_fields: поля для поиска категорий
+    """
+
     list_display = ('id', 'name')
     list_filter = ('name',)
     search_fields = ('name',)
@@ -46,20 +37,44 @@ class AuthorAdmin(admin.ModelAdmin):
 
 @admin.register(Contact)
 class ContactAdmin(admin.ModelAdmin):
+    """
+    Административная конфигурация для модели Contact (Контактные данные).
+
+    Используется для управления контактной информацией компании в админ-панели.
+
+    Настройки:
+    - list_display: основные поля, отображаемые в списке контактов
+    - list_filter: фильтр по стране для быстрой группировки
+    - search_fields: поля для поиска контактной информации
+    - readonly_fields: поля, доступные только для чтения
+    - fieldsets: группировка полей формы редактирования на логические блоки
+
+    Fieldsets организуют форму редактирования:
+    - Основная информация (страна, ИНН, адрес)
+    - Контактные данные (телефон, email, график работы)
+    - Служебная информация (метки времени создания/обновления)
+    """
+
     list_display = ('country', 'inn', 'phone', 'email', 'updated_at')
     list_filter = ('country',)
     search_fields = ('country', 'inn', 'phone', 'email')
     readonly_fields = ('created_at', 'updated_at')
 
     fieldsets = (
-        ('Основная информация', {
-            'fields': ('country', 'inn', 'address')
-        }),
-        ('Контактные данные', {
-            'fields': ('phone', 'email', 'schedule')
-        }),
-        ('Служебная информация', {
-            'fields': ('created_at', 'updated_at'),
-            'classes': ('collapse',)
-        }),
+        (
+            'Основная информация',
+            {'fields': ('country', 'inn', 'address'), 'description': 'Основные реквизиты компании'},
+        ),
+        (
+            'Контактные данные',
+            {'fields': ('phone', 'email', 'schedule'), 'description': 'Способы связи и график работы'},
+        ),
+        (
+            'Служебная информация',
+            {
+                'fields': ('created_at', 'updated_at'),
+                'classes': ('collapse',),
+                'description': 'Автоматически заполняемые системные поля',
+            },
+        ),
     )

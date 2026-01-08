@@ -1,9 +1,8 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
-from django.conf.global_settings import MEDIA_URL, MEDIA_ROOT
+from django.conf.global_settings import MEDIA_ROOT, MEDIA_URL
 from dotenv import load_dotenv
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

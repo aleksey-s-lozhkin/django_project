@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from catalog.models import Product, Contact
+
+from catalog.models import Contact, Product
 
 
 def home(request):
