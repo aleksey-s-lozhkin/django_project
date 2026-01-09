@@ -53,16 +53,6 @@ flake8 = "^7.0.0"
 isort = "^6.0.0"
 mypy = "^1.0.0"
 
-[tool.poetry.scripts]
-export-requirements = "poetry export -f requirements.txt --output requirements.txt --without-hashes"
-makemigrations = "python manage.py makemigrations"
-migrate = "python manage.py migrate"
-runserver = "python manage.py runserver"
-shell = "python manage.py shell"
-createsuperuser = "python manage.py createsuperuser"
-test = "pytest"
-check = "python manage.py check"
-
 [build-system]
 requires = ["poetry-core>=2.0.0"]
 build-backend = "poetry.core.masonry.api"
