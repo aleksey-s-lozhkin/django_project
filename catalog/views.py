@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 
 from catalog.models import Contact, Product
 
@@ -50,6 +50,7 @@ def contacts(request):
     }
 
     return render(request, 'contacts.html', context)
+
 
 def product_details(request, pk):
 
