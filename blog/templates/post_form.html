@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if object %}Редактирование поста{% else %}Создание поста{% endif %} - Skystore
+{% endblock %}
+
+{% block content %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4 fw-bold">Skystore</h1>
+    <p class="lead fs-4">
+        {% if object %}Редактирование поста{% else %}Создание нового поста{% endif %}
+    </p>
+</div>
+
+<div class="container">
+    <!-- Хлебные крошки -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'blog:post_list' %}">Блог</a></li>
+            <li class="breadcrumb-item active">
+                {% if object %}Редактирование{% else %}Создание{% endif %}
+            </li>
+        </ol>
+    </nav>
+
+    <!-- Форма -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h4 class="my-0 fw-normal text-center">
+                        {% if object %}Редактирование поста{% else %}Создание нового поста{% endif %}
+                    </h4>
+                </div>
+
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <!-- Заголовок -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Заголовок</label>
+                            <input type="text"
+                                   name="title"
+                                   class="form-control form-control-lg"
+                                   value="{{ form.title.value|default:'' }}"
+                                   required
+                                   placeholder="Введите заголовок поста">
+                        </div>
+
+                        <!-- Контент -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Содержание</label>
+                            <textarea name="content"
+                                      class="form-control"
+                                      rows="12"
+                                      required
+                                      placeholder="Введите содержание поста">{{ form.content.value|default:'' }}</textarea>
+                        </div>
+
+                        <!-- Изображение -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Изображение</label>
+                            <input type="file"
+                                   name="preview"
+                                   class="form-control"
+                                   accept="image/*">
+
+                            {% if object and object.preview %}
+                            <div class="mt-3">
+                                <p class="text-muted mb-2">Текущее изображение:</p>
+                                <div class="text-center">
+                                    <img src="{{ object.preview.url }}"
+                                         class="img-thumbnail"
+                                         style="max-width: 300px;">
+                                </div>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input"
+                                           type="checkbox"
+                                           name="clear_preview"
+                                           id="clear_preview">
+                                    <label class="form-check-label" for="clear_preview">
+                                        Удалить текущее изображение
+                                    </label>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Публикация -->
+                        <div class="mb-4">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input"
+                                       type="checkbox"
+                                       name="is_published"
+                                       id="is_published"
+                                       {% if form.is_published.value %}checked{% endif %}>
+                                <label class="form-check-label fw-bold" for="is_published">
+                                    Опубликовать пост
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Кнопки -->
+                        <div class="d-flex gap-3">
+                            <a href="{% if object %}{% url 'blog:post_detail' object.pk %}{% else %}{% url 'blog:post_list' %}{% endif %}"
+                               class="btn btn-lg btn-outline-secondary flex-fill">
+                                Отмена
+                            </a>
+                            <button type="submit" class="btn btn-lg btn-primary flex-fill">
+                                {% if object %}Сохранить изменения{% else %}Создать пост{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

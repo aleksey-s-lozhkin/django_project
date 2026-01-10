@@ -1,61 +1,39 @@
 from django.contrib import messages
-from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import redirect
+from django.views.generic import DetailView, ListView, TemplateView
 
 from catalog.models import Contact, Product
 
 
-def home(request):
-    """Контроллер главной страницы с пагинацией"""
-
-    # Получаем все продукты
-    all_products = Product.objects.all().order_by('id')
-
-    # Создаем пагинатор: 5 продуктов на страницу
-    paginator = Paginator(all_products, 5)
-
-    # Получаем номер страницы из GET-параметра
-    page_number = request.GET.get('page')
-
-    # Получаем объект страницы
-    page_obj = paginator.get_page(page_number)
-
-    # Передаем в контекст
-    context = {
-        'page_obj': page_obj,
-        'latest_products': page_obj.object_list,  # для совместимости с вашим шаблоном
-    }
-
-    return render(request, 'home.html', context)
+class HomeView(ListView):
+    template_name = 'home.html'
+    model = Product
+    context_object_name = 'latest_products'
+    paginate_by = 5
+    ordering = ['-id']
 
 
-def contacts(request):
-    """Контроллер страницы контактов"""
+class ContactsView(TemplateView):
+    template_name = 'contacts.html'
 
-    # Получаем контактные данные из базы
-    contact_info = Contact.objects.first()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['contact'] = Contact.objects.first()
+        return context
 
-    if request.method == 'POST':
-        # Получаем данные из формы обратной связи
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        message = request.POST.get('message')
-
-        messages.success(request, 'Ваше сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.')
-
+    def post(self, request, *args, **kwargs):
+        name = request.POST.get('name', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        message = request.POST.get('message', '').strip()
+        if not all([name, phone, message]):
+            messages.error(request, 'Пожалуйста, заполните все поля формы.')
+        else:
+            # Сюда нужно добавить логику (сохранение в БД, отправка e-mail...)
+            messages.success(request, 'Ваше сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.')
         return redirect('/contacts/')
 
-    context = {
-        'contact': contact_info,
-    }
 
-    return render(request, 'contacts.html', context)
-
-
-def product_details(request, pk):
-
-    product = get_object_or_404(Product, pk=pk)
-    context = {
-        'product': product,
-    }
-    return render(request, 'product_details.html', context)
+class ProductDetailView(DetailView):
+    template_name = 'product_details.html'
+    model = Product
+    context_object_name = 'product'
