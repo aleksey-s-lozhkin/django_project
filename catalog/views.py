@@ -1,31 +1,29 @@
 from django.contrib import messages
-from django.shortcuts import redirect, render
+from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404, redirect, render
 
 from catalog.models import Contact, Product
 
 
 def home(request):
-    """Контроллер главной страницы с выводом последних 5 продуктов в консоль"""
+    """Контроллер главной страницы с пагинацией"""
 
-    # Выборка последних 5 созданных продуктов
-    latest_products = Product.objects.order_by('-created_at')[:5]
+    # Получаем все продукты
+    all_products = Product.objects.all().order_by('id')
 
-    # Вывод в консоль
-    print("=" * 50)
-    print("ПОСЛЕДНИЕ 5 СОЗДАННЫХ ПРОДУКТОВ:")
-    print("=" * 50)
-    for product in latest_products:
-        print(f"• {product.name}")
-        print(f"  Цена: {product.price} руб.")
-        print(f"  Категория: {product.category.name if product.category else 'Без категории'}")
-        print(f"  Создан: {product.created_at}")
-        print("-" * 30)
-    print(f"Всего показано: {len(latest_products)} продуктов")
-    print("=" * 50)
+    # Создаем пагинатор: 5 продуктов на страницу
+    paginator = Paginator(all_products, 5)
 
-    # Передаем последние продукты в шаблон
+    # Получаем номер страницы из GET-параметра
+    page_number = request.GET.get('page')
+
+    # Получаем объект страницы
+    page_obj = paginator.get_page(page_number)
+
+    # Передаем в контекст
     context = {
-        'latest_products': latest_products,
+        'page_obj': page_obj,
+        'latest_products': page_obj.object_list,  # для совместимости с вашим шаблоном
     }
 
     return render(request, 'home.html', context)
@@ -52,3 +50,12 @@ def contacts(request):
     }
 
     return render(request, 'contacts.html', context)
+
+
+def product_details(request, pk):
+
+    product = get_object_or_404(Product, pk=pk)
+    context = {
+        'product': product,
+    }
+    return render(request, 'product_details.html', context)

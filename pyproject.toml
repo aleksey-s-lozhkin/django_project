@@ -1,51 +1,66 @@
-[project]
+[tool.poetry]
 name = "djangoproject"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Aleksey Lozhkin",email = "aleksey.s.lozhkin@gmail.com"}
-]
+authors = ["Aleksey Lozhkin <aleksey.s.lozhkin@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.12"
-dependencies = [
-    "django (>=6.0,<7.0)",
-    "dotenv (>=0.9.9,<0.10.0)",
-    "psycopg2-binary (>=2.9.11,<3.0.0)",
-    "pillow (>=12.1.0,<13.0.0)",
-    "black (>=25.12.0,<26.0.0)",
-    "ipython (>=9.9.0,<10.0.0)"
-]
+license = ""
+packages = [{include = "djangoproject"}]
 
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.group.lint.dependencies]
-flake8 = "^7.3.0"
-mypy = "^1.17.0"
-black = "^25.1.0"
-isort = "^6.0.1"
+[tool.poetry.dependencies]
+python = ">=3.12,<4.0"
+django = ">=6.0,<7.0"
+python-dotenv = "^1.0.0"
+psycopg2-binary = "^2.9.9"
+pillow = "^10.3.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.4.1"
-pytest-cov = "^6.2.1"
-types-psycopg2 = "^2.9.21.20251012"
+# Инструменты разработки
+ipython = "^9.0.0"
+django-debug-toolbar = "^4.4.0"
+django-extensions = "^3.2.3"
 
-[tool.mypy]
-python_version = "3.12"
-warn_return_any = true
-warn_unused_configs = true
-show_error_codes = true
-exclude = "venv/|.venv/|build/|dist/|.mypy_cache/"
+# Линтинг и форматирование
+black = {extras = ["d"], version = "^25.0.0"}
+flake8 = "^7.0.0"
+isort = "^6.0.0"
+mypy = "^1.0.0"
+pre-commit = "^3.0.0"
 
-[[tool.mypy.overrides]]
-module = "tests.*"
-ignore_errors = true
+# Тестирование
+pytest = "^8.0.0"
+pytest-django = "^4.8.0"
+pytest-cov = "^5.0.0"
+pytest-mock = "^3.12.0"
+factory-boy = "^3.3.0"
+faker = "^24.0.0"
+
+# Типы для статического анализа
+types-psycopg2 = "^2.9.21"
+django-stubs = {extras = ["compatible-mypy"], version = "^5.0.0"}
+
+[tool.poetry.group.test.dependencies]
+# Только тестирование (для CI/CD)
+pytest = "^8.0.0"
+pytest-django = "^4.8.0"
+pytest-cov = "^5.0.0"
+factory-boy = "^3.3.0"
+
+[tool.poetry.group.lint.dependencies]
+# Только линтинг (для CI/CD)
+black = {extras = ["d"], version = "^25.0.0"}
+flake8 = "^7.0.0"
+isort = "^6.0.0"
+mypy = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 119
 skip-string-normalization = true
+target-version = ['py312']
 include = '\.pyi?$'
 exclude = '''
 /(
@@ -59,20 +74,110 @@ exclude = '''
   | buck-out
   | build
   | dist
+  | migrations
+  | __pycache__
 )/
 '''
 
 [tool.isort]
 profile = "black"
 line_length = 119
-skip = [".venv", "venv"]
+skip = [".venv", "venv", "migrations"]
+known_first_party = ["djangoproject"]
 
-[tool.poetry.scripts]
-export-requirements = "poetry export -f requirements.txt --output requirements.txt --without-hashes"
+[tool.flake8]
+max-line-length = 119
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "migrations",
+    "*.egg-info",
+]
+per-file-ignores = [
+    "*/migrations/*:E501",
+    "*/tests/*:S101",
+]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+show_error_codes = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+plugins = [
+    "django_stubs.ext.mypy",
+]
+
+[[tool.mypy.overrides]]
+module = [
+    "tests.*",
+    "*test*",
+    "*/tests/*",
+]
+disallow_untyped_defs = false
+
+[[tool.mypy.overrides]]
+module = [
+    "manage.py",
+    "*/migrations/*",
+]
+ignore_errors = true
 
 [tool.pytest.ini_options]
-addopts = "--cov=src --cov-report=html --cov-report=term --cov-fail-under=80"
+DJANGO_SETTINGS_MODULE = "djangoproject.settings"
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
 testpaths = ["tests"]
-python_files = "test_*.py"
-python_classes = "Test*"
-python_functions = "test_*"
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-v",
+    "--tb=short",
+    "--ds=djangoproject.settings",
+    "--reuse-db",
+]
+markers = [
+    "slow: marks tests as slow",
+    "integration: integration tests",
+    "unit: unit tests",
+    "e2e: end-to-end tests",
+]
+
+[tool.coverage.run]
+source = ["djangoproject"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/migrations/*",
+    "*/__pycache__/*",
+    "manage.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "@admin.register",
+    "@receiver",
+    "# type: ignore",
+]
