@@ -1,8 +1,9 @@
-    <!-- Навигационная панель -->
-    <header class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
-        <h5 class="my-0 me-md-auto fw-normal">Skystore</h5>
-        <nav class="ms-5">
-            <a class="p-2 btn btn-outline-primary me-2" href="/">Каталог</a>
-            <a class="p-2 btn btn-outline-primary" href="/contacts/">Контакты</a>
-        </nav>
-    </header>
+<!-- Навигационная панель -->
+<header class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom box-shadow">
+    <h5 class="my-0 me-md-auto fw-normal">Skystore</h5>
+    <nav class="ms-5">
+        <a class="p-2 btn btn-outline-primary me-2" href="/">Каталог</a>
+        <a class="p-2 btn btn-outline-primary me-2" href="{% url 'blog:post_list' %}">Блог</a>
+        <a class="p-2 btn btn-outline-primary" href="/contacts/">Контакты</a>
+    </nav>
+</header>

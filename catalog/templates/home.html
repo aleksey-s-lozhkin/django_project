@@ -3,105 +3,108 @@
 {% block title %}Skystore - Главная{% endblock %}
 
 {% block content %}
-    <!-- Основной контент -->
-    <main>
-        <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-            <h1 class="display-4 fw-bold">Skystore</h1>
-            <p class="lead fs-4">Skystore - это отличный вариант хранения ваших плагинов и примеров кода, который вы бы хотели продать</p>
+<!-- Основной контент -->
+<main>
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-4 fw-bold">Skystore</h1>
+        <p class="lead fs-4">Skystore - это отличный вариант хранения ваших плагинов и примеров кода, который вы бы
+            хотели продать</p>
+    </div>
+
+    <div class="container">
+        <!-- Информация о пагинации -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-center mb-0">Каталог товаров</h2>
+            <div class="text-muted">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+            </div>
         </div>
 
-        <div class="container">
-            <!-- Информация о пагинации -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="text-center mb-0">Каталог товаров</h2>
-                <div class="text-muted">
-                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
-                </div>
-            </div>
+        {% if latest_products %}
+        <div class="mb-5">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-4">
+                {% for product in latest_products %}
+                <div class="col">
+                    <div class="card mb-4 box-shadow h-100 d-flex flex-column">
+                        <div class="card-header py-3 d-flex align-items-center justify-content-center">
+                            <h4 class="my-0 fw-normal text-center">{{ product.name }}</h4>
+                        </div>
+                        {% if product.image %}
+                        <div class="card-img-top d-flex align-items-center justify-content-center"
+                             style="height: 200px; overflow: hidden;">
+                            <img src="{{ product.image.url }}"
+                                 class="img-fluid h-100 w-auto"
+                                 alt="{{ product.name }}">
+                        </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
 
-            {% if latest_products %}
-            <div class="mb-5">
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-5 g-4">
-                    {% for product in latest_products %}
-                    <div class="col">
-                        <div class="card mb-4 box-shadow h-100 d-flex flex-column">
-                            <div class="card-header py-3 d-flex align-items-center justify-content-center">
-                                <h4 class="my-0 fw-normal text-center">{{ product.name }}</h4>
-                            </div>
-                            {% if product.image %}
-                            <div class="card-img-top d-flex align-items-center justify-content-center" style="height: 200px; overflow: hidden;">
-                                <img src="{{ product.image.url }}"
-                                     class="img-fluid h-100 w-auto"
-                                     alt="{{ product.name }}">
-                            </div>
-                            {% endif %}
-                            <div class="card-body d-flex flex-column">
+                            <p class="card-text mb-3">{{ product.description|truncatechars:100 }}</p>
+                            <div class="mt-auto">
 
-                                <p class="card-text mb-3">{{ product.description|truncatechars:100 }}</p>
-                                <div class="mt-auto">
-
-                                    <a href="{% url 'catalog:product_details' pk=product.id %}" class="btn btn-lg btn-outline-primary w-100">
-                                        О товаре
-                                    </a>
-                                </div>
+                                <a href="{% url 'catalog:product_details' pk=product.id %}"
+                                   class="btn btn-lg btn-outline-primary w-100">
+                                    О товаре
+                                </a>
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
                 </div>
-
-                <!-- Пагинация -->
-                {% if page_obj.paginator.num_pages > 1 %}
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center mt-5">
-                        <!-- Кнопка "Назад" -->
-                        {% if page_obj.has_previous %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
-                        {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link" aria-hidden="true">&laquo;</span>
-                        </li>
-                        {% endif %}
-
-                        <!-- Номера страниц -->
-                        {% for num in page_obj.paginator.page_range %}
-                            {% if page_obj.number == num %}
-                            <li class="page-item active" aria-current="page">
-                                <span class="page-link">{{ num }}</span>
-                            </li>
-                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
-                            {% endif %}
-                        {% endfor %}
-
-                        <!-- Кнопка "Вперед" -->
-                        {% if page_obj.has_next %}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
-                        {% else %}
-                        <li class="page-item disabled">
-                            <span class="page-link" aria-hidden="true">&raquo;</span>
-                        </li>
-                        {% endif %}
-                    </ul>
-                </nav>
-                {% endif %}
-
+                {% endfor %}
             </div>
-            {% else %}
-            <div class="alert alert-info text-center" role="alert">
-                Товары не найдены
-            </div>
+
+            <!-- Пагинация -->
+            {% if page_obj.paginator.num_pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center mt-5">
+                    <!-- Кнопка "Назад" -->
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&laquo;</span>
+                    </li>
+                    {% endif %}
+
+                    <!-- Номера страниц -->
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    <!-- Кнопка "Вперед" -->
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link" aria-hidden="true">&raquo;</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
             {% endif %}
+
         </div>
-    </main>
+        {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            Товары не найдены
+        </div>
+        {% endif %}
+    </div>
+</main>
 {% endblock %}
