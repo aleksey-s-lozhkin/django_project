@@ -38,7 +38,7 @@ class PostCreateView(CreateView):
     """Создание нового поста"""
 
     model = Post
-    template_name = 'post_form.html'
+    template_name = 'blog/post_form.html'
     fields = ['title', 'content', 'preview', 'is_published']
     success_url = reverse_lazy('blog:post_list')
 
@@ -53,7 +53,7 @@ class PostUpdateView(UpdateView):
     """Редактирование поста"""
 
     model = Post
-    template_name = 'post_form.html'
+    template_name = 'blog/post_form.html'
     fields = ['title', 'content', 'preview', 'is_published']
 
     def form_valid(self, form):
@@ -70,7 +70,7 @@ class PostDeleteView(DeleteView):
     """Удаление поста"""
 
     model = Post
-    template_name = 'post_confirm_delete.html'
+    template_name = 'blog/post_confirm_delete.html'
     success_url = reverse_lazy('blog:post_list')
 
     def delete(self, request, *args, **kwargs):
