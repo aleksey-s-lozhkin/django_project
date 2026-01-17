@@ -12,16 +12,16 @@
                 <div class="card-header">
                     <h2 class="mb-0">
                         {% if object %}
-                            <i class="bi bi-pencil-square"></i> Редактирование продукта
+                            ✏️ Редактирование продукта
                         {% else %}
-                            <i class="bi bi-plus-circle"></i> Создание нового продукта
+                            ➕ Создание нового продукта
                         {% endif %}
                     </h2>
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data" novalidate>
+                    <form method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        
+
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger">
                                 {% for error in form.non_field_errors %}
@@ -29,37 +29,37 @@
                                 {% endfor %}
                             </div>
                         {% endif %}
-                        
+
                         <div class="mb-3">
                             <label for="{{ form.name.id_for_label }}" class="form-label">
                                 {{ form.name.label }}
                             </label>
                             {{ form.name }}
                             {% if form.name.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="text-danger">
                                     {% for error in form.name.errors %}
-                                        {{ error }}
+                                        <small>{{ error }}</small>
                                     {% endfor %}
                                 </div>
                             {% endif %}
-                            <div class="form-text">Название продукта должно быть уникальным и не содержать запрещенных слов.</div>
+                            <div class="form-text">Название не должно содержать запрещенных слов.</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="{{ form.description.id_for_label }}" class="form-label">
                                 {{ form.description.label }}
                             </label>
                             {{ form.description }}
                             {% if form.description.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="text-danger">
                                     {% for error in form.description.errors %}
-                                        {{ error }}
+                                        <small>{{ error }}</small>
                                     {% endfor %}
                                 </div>
                             {% endif %}
-                            <div class="form-text">Подробное описание продукта. Не используйте запрещенные слова.</div>
+                            <div class="form-text">Описание не должно содержать запрещенных слов.</div>
                         </div>
-                        
+
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.category.id_for_label }}" class="form-label">
@@ -67,14 +67,14 @@
                                 </label>
                                 {{ form.category }}
                                 {% if form.category.errors %}
-                                    <div class="invalid-feedback d-block">
+                                    <div class="text-danger">
                                         {% for error in form.category.errors %}
-                                            {{ error }}
+                                            <small>{{ error }}</small>
                                         {% endfor %}
                                     </div>
                                 {% endif %}
                             </div>
-                            
+
                             <div class="col-md-6 mb-3">
                                 <label for="{{ form.price.id_for_label }}" class="form-label">
                                     {{ form.price.label }}
@@ -84,45 +84,45 @@
                                     <span class="input-group-text">₽</span>
                                 </div>
                                 {% if form.price.errors %}
-                                    <div class="invalid-feedback d-block">
+                                    <div class="text-danger">
                                         {% for error in form.price.errors %}
-                                            {{ error }}
+                                            <small>{{ error }}</small>
                                         {% endfor %}
                                     </div>
                                 {% endif %}
                                 <div class="form-text">Цена должна быть положительной.</div>
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label for="{{ form.image.id_for_label }}" class="form-label">
                                 {{ form.image.label }}
                             </label>
                             {{ form.image }}
                             {% if form.image.errors %}
-                                <div class="invalid-feedback d-block">
+                                <div class="text-danger">
                                     {% for error in form.image.errors %}
-                                        {{ error }}
+                                        <small>{{ error }}</small>
                                     {% endfor %}
                                 </div>
                             {% endif %}
                             {% if object.image %}
                                 <div class="mt-2">
-                                    <small>Текущее изображение:</small>
-                                    <br>
-                                    <img src="{{ object.image.url }}" alt="{{ object.name }}" class="img-thumbnail mt-1" style="max-height: 100px;">
+                                    <small class="text-muted">Текущее изображение:</small>
+                                    <div class="mt-1">
+                                        <img src="{{ object.image.url }}" alt="{{ object.name }}" class="img-thumbnail">
+                                    </div>
                                 </div>
                             {% endif %}
-                            <div class="form-text">Поддерживаемые форматы: JPG, PNG. Максимальный размер: 5 МБ.</div>
+                            <div class="form-text">JPG, PNG до 5 МБ.</div>
                         </div>
-                        
+
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary me-md-2">
-                                <i class="bi bi-arrow-left"></i> Назад к списку
+                                ↩️ Назад к списку
                             </a>
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle"></i> 
-                                {% if object %}Сохранить изменения{% else %}Создать продукт{% endif %}
+                                {% if object %}💾 Сохранить{% else %}✅ Создать{% endif %}
                             </button>
                         </div>
                     </form>
@@ -131,19 +131,4 @@
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Добавляем класс is-invalid к полям с ошибками
-    const formFields = document.querySelectorAll('input, select, textarea');
-    formFields.forEach(field => {
-        if (field.classList.contains('form-control') || field.classList.contains('form-select')) {
-            const errorDiv = field.parentElement.querySelector('.invalid-feedback');
-            if (errorDiv && errorDiv.textContent.trim()) {
-                field.classList.add('is-invalid');
-            }
-        }
-    });
-});
-</script>
 {% endblock %}
