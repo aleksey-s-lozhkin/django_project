@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import DetailView, ListView, TemplateView, CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
 
-from catalog.models import Contact, Product
 from catalog.forms import ProductForm
+from catalog.models import Contact, Product
 
 
 class HomeView(ListView):
@@ -36,6 +36,7 @@ class ContactsView(TemplateView):
 
 class ProductListView(ListView):
     """Список всех продуктов"""
+
     model = Product
     template_name = 'catalog/product_list.html'
     context_object_name = 'products'
@@ -45,6 +46,7 @@ class ProductListView(ListView):
 
 class ProductCreateView(CreateView):
     """Создание нового продукта"""
+
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
@@ -61,6 +63,7 @@ class ProductCreateView(CreateView):
 
 class ProductUpdateView(UpdateView):
     """Редактирование существующего продукта"""
+
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
@@ -77,6 +80,7 @@ class ProductUpdateView(UpdateView):
 
 class ProductDeleteView(DeleteView):
     """Удаление продукта"""
+
     model = Product
     template_name = 'catalog/product_confirm_delete.html'
     success_url = reverse_lazy('catalog:product_list')
@@ -88,6 +92,7 @@ class ProductDeleteView(DeleteView):
 
 class ProductDetailView(DetailView):
     """Детальная информация о продукте"""
+
     template_name = 'catalog/product_detail.html'
     model = Product
     context_object_name = 'product'

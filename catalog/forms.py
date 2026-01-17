@@ -1,5 +1,8 @@
+import os
+
 from django import forms
 from django.core.exceptions import ValidationError
+
 from catalog.models import Product
 
 
@@ -7,10 +10,7 @@ class ProductForm(forms.ModelForm):
     """Форма для создания и редактирования продуктов с валидацией"""
 
     # Константы для запрещенных слов
-    FORBIDDEN_WORDS = {
-        'казино', 'криптовалюта', 'крипта', 'биржа',
-        'дешево', 'бесплатно', 'обман', 'полиция', 'радар'
-    }
+    FORBIDDEN_WORDS = {'казино', 'криптовалюта', 'крипта', 'биржа', 'дешево', 'бесплатно', 'обман', 'полиция', 'радар'}
 
     class Meta:
         model = Product
@@ -22,25 +22,32 @@ class ProductForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Стилизация всех полей формы
-        for field_name, field in self.fields.items():
-            if field_name != 'image':  # Для поля image отдельная обработка
-                if isinstance(field.widget, forms.CheckboxInput):
-                    field.widget.attrs.update({'class': 'form-check-input'})
-                elif isinstance(field.widget, forms.Select):
-                    field.widget.attrs.update({'class': 'form-select'})
-                else:
-                    field.widget.attrs.update({'class': 'form-control'})
 
-            # Добавляем placeholder для полей
-            if field_name == 'name':
-                field.widget.attrs['placeholder'] = 'Введите название продукта'
-            elif field_name == 'description':
-                field.widget.attrs['placeholder'] = 'Введите описание продукта'
-            elif field_name == 'price':
-                field.widget.attrs['placeholder'] = '0.00'
-                field.widget.attrs['step'] = '0.01'
-                field.widget.attrs['min'] = '0'
+        self.fields['name'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Введите название продукта'
+        })
+
+        self.fields['description'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Введите описание продукта',
+            'rows': 4
+        })
+
+        self.fields['category'].widget.attrs.update({
+            'class': 'form-select'
+        })
+
+        self.fields['price'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': '0.00',
+            'step': '0.01',
+            'min': '0'
+        })
+
+        self.fields['image'].widget.attrs.update({
+            'class': 'form-control'
+        })
 
     def clean_name(self):
         """Валидация названия продукта"""
@@ -48,9 +55,7 @@ class ProductForm(forms.ModelForm):
 
         for forbidden_word in self.FORBIDDEN_WORDS:
             if forbidden_word in name:
-                raise ValidationError(
-                    f'Название содержит запрещенное слово: "{forbidden_word}"'
-                )
+                raise ValidationError(f'Название содержит запрещенное слово: "{forbidden_word}"')
 
         return self.cleaned_data['name']
 
@@ -60,9 +65,7 @@ class ProductForm(forms.ModelForm):
 
         for forbidden_word in self.FORBIDDEN_WORDS:
             if forbidden_word in description:
-                raise ValidationError(
-                    f'Описание содержит запрещенное слово: "{forbidden_word}"'
-                )
+                raise ValidationError(f'Описание содержит запрещенное слово: "{forbidden_word}"')
 
         return self.cleaned_data['description']
 
@@ -76,21 +79,15 @@ class ProductForm(forms.ModelForm):
         return price
 
     def clean_image(self):
-        """Валидация изображения (дополнительное задание)"""
+        """Валидация изображения"""
         image = self.cleaned_data.get('image')
 
         if image:
-            # Проверка размера файла (5 МБ = 5 * 1024 * 1024 байт)
             if image.size > 5 * 1024 * 1024:
                 raise ValidationError('Размер изображения не должен превышать 5 МБ')
-
-            # Проверка формата файла
             allowed_extensions = ['.jpg', '.jpeg', '.png']
-            import os
             ext = os.path.splitext(image.name)[1].lower()
             if ext not in allowed_extensions:
-                raise ValidationError(
-                    'Допустимые форматы изображений: JPG, JPEG, PNG'
-                )
+                raise ValidationError('Допустимые форматы изображений: JPG, JPEG, PNG')
 
         return image

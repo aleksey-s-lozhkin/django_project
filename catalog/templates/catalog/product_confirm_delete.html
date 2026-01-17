@@ -8,16 +8,16 @@
         <div class="col-md-6">
             <div class="card border-danger">
                 <div class="card-header bg-danger text-white">
-                    <h2 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Подтверждение удаления</h2>
+                    <h2 class="mb-0">⚠️ Подтверждение удаления</h2>
                 </div>
                 <div class="card-body">
                     <h4 class="card-title">Вы уверены, что хотите удалить продукт?</h4>
-                    
+
                     <div class="alert alert-warning">
-                        <i class="bi bi-exclamation-circle"></i>
+                        ⚠️
                         <strong>Внимание!</strong> Это действие нельзя отменить. Все данные о продукте будут удалены безвозвратно.
                     </div>
-                    
+
                     <div class="card mb-3">
                         <div class="card-body">
                             <h5 class="card-title">{{ object.name }}</h5>
@@ -31,15 +31,15 @@
                             {% endif %}
                         </div>
                     </div>
-                    
+
                     <form method="post">
                         {% csrf_token %}
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="{% url 'catalog:product_detail' object.pk %}" class="btn btn-secondary me-md-2">
-                                <i class="bi bi-x-circle"></i> Отмена
+                                ❌ Отмена
                             </a>
                             <button type="submit" class="btn btn-danger">
-                                <i class="bi bi-trash"></i> Удалить навсегда
+                                🗑️ Удалить навсегда
                             </button>
                         </div>
                     </form>
