@@ -11,63 +11,135 @@
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
 
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
                     <!-- Email -->
                     <div class="mb-3">
-                        <label class="form-label">Email *</label>
-                        <input type="email" name="email" class="form-control"
-                               placeholder="example@mail.com" required>
+                        <label for="{{ form.email.id_for_label }}" class="form-label">
+                            {{ form.email.label }} *
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger">
+                                {% for error in form.email.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <!-- Имя -->
                     <div class="mb-3">
-                        <label class="form-label">Имя *</label>
-                        <input type="text" name="first_name" class="form-control"
-                               placeholder="Иван" required>
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                            {{ form.first_name.label }} *
+                        </label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger">
+                                {% for error in form.first_name.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <!-- Фамилия -->
                     <div class="mb-3">
-                        <label class="form-label">Фамилия *</label>
-                        <input type="text" name="last_name" class="form-control"
-                               placeholder="Иванов" required>
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                            {{ form.last_name.label }} *
+                        </label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger">
+                                {% for error in form.last_name.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <!-- Телефон -->
                     <div class="mb-3">
-                        <label class="form-label">Телефон</label>
-                        <input type="text" name="phone" class="form-control"
-                               placeholder="+7 (999) 123-45-67">
+                        <label for="{{ form.phone.id_for_label }}" class="form-label">
+                            {{ form.phone.label }}
+                        </label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                            <div class="text-danger">
+                                {% for error in form.phone.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <!-- Страна -->
                     <div class="mb-3">
-                        <label class="form-label">Страна</label>
-                        <input type="text" name="country" class="form-control"
-                               placeholder="Россия">
+                        <label for="{{ form.country.id_for_label }}" class="form-label">
+                            {{ form.country.label }}
+                        </label>
+                        {{ form.country }}
+                        {% if form.country.errors %}
+                            <div class="text-danger">
+                                {% for error in form.country.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <!-- Аватар -->
                     <div class="mb-3">
-                        <label class="form-label">Аватар</label>
-                        <input type="file" name="avatar" class="form-control"
-                               accept="image/*" id="avatar-input">
+                        <label for="{{ form.avatar.id_for_label }}" class="form-label">
+                            {{ form.avatar.label }}
+                        </label>
+                        {{ form.avatar }}
+                        {% if form.avatar.errors %}
+                            <div class="text-danger">
+                                {% for error in form.avatar.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                         <div class="form-text">
-                            Загрузите изображение (JPG, PNG, GIF, до 2 МБ).
+                            {{ form.avatar.help_text }}
                         </div>
                     </div>
 
                     <!-- Пароль 1 -->
                     <div class="mb-3">
-                        <label class="form-label">Пароль *</label>
-                        <input type="password" name="password1" class="form-control"
-                               placeholder="Минимум 8 символов" required>
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">
+                            {{ form.password1.label }} *
+                        </label>
+                        {{ form.password1 }}
+                        {% if form.password1.errors %}
+                            <div class="text-danger">
+                                {% for error in form.password1.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <!-- Пароль 2 -->
                     <div class="mb-3">
-                        <label class="form-label">Подтверждение пароля *</label>
-                        <input type="password" name="password2" class="form-control"
-                               placeholder="Повторите пароль" required>
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">
+                            {{ form.password2.label }} *
+                        </label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                            <div class="text-danger">
+                                {% for error in form.password2.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
                     <div class="d-grid gap-2">
@@ -83,10 +155,11 @@
     </div>
 </div>
 {% endblock %}
+
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const avatarInput = document.getElementById('avatar-input');
+        const avatarInput = document.querySelector('input[type="file"]');
 
         if (avatarInput) {
             avatarInput.addEventListener('change', function(e) {

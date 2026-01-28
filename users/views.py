@@ -1,10 +1,11 @@
-from django.views.generic import CreateView
-from django.core.mail import send_mail
-from django.urls import reverse_lazy
-from django.contrib.auth.views import LoginView
 from django.contrib.auth import logout
+from django.contrib.auth.views import LoginView
+from django.core.mail import send_mail
 from django.shortcuts import redirect
-from .forms import UserRegistrationForm, CustomAuthenticationForm
+from django.urls import reverse_lazy
+from django.views.generic import CreateView
+
+from .forms import CustomAuthenticationForm, UserRegistrationForm
 from .models import User
 
 
@@ -14,16 +15,23 @@ class RegisterView(CreateView):
     template_name = 'users/register.html'
     success_url = reverse_lazy('users:login')
 
+    def get_form_kwargs(self):
+        """Передаем request.FILES в форму для загрузки аватарки"""
+        kwargs = super().get_form_kwargs()
+        if self.request.method in ('POST', 'PUT'):
+            kwargs.update({'data': self.request.POST, 'files': self.request.FILES})
+        return kwargs
+
     def form_valid(self, form):
         user = form.save()
         self.send_welcome_email(user.email)
         return super().form_valid(form)
 
     def send_welcome_email(self, user_email):
-        subject = 'Hello!'
-        message = 'Thanks for registering now!'
+        subject = 'Добро пожаловать!'
+        message = 'Спасибо за регистрацию в нашем сервисе!'
         from_email = 'python-project-login@yandex.by'
-        recipient_list = [user_email,]
+        recipient_list = [user_email]
         send_mail(subject, message, from_email, recipient_list)
 
 
@@ -35,14 +43,20 @@ class CustomLoginView(LoginView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
 
-        if 'data' in kwargs:
-            data = kwargs['data'].copy()
-            if 'email' in data and 'username' not in data:
+        if self.request.method == 'POST':
+            data = kwargs.get('data', {}).copy()
+            # Если есть поле 'email', используем его как 'username'
+            if 'email' in data:
                 data['username'] = data['email']
+
+            if 'username' in data:
+                data['username'] = data['username'].lower().strip()
+
             kwargs['data'] = data
+
         return kwargs
+
 
 def logout_view(request):
     logout(request)
-    return redirect('users/login.html')
-
+    return redirect('users:login')

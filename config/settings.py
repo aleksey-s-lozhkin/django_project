@@ -1,8 +1,8 @@
-import ssl
-import certifi
 import os
+import ssl
 from pathlib import Path
 
+import certifi
 from dotenv import load_dotenv
 
 os.environ['SSL_CERT_FILE'] = certifi.where()
@@ -116,7 +116,7 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
-#EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend"
+# EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend"
 EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.yandex.ru')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 465))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False') == 'True'

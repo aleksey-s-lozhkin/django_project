@@ -1,3 +1,4 @@
+<!-- login.html -->
 {% extends 'base.html' %}
 
 {% block content %}
@@ -19,27 +20,35 @@
                         </div>
                     {% endif %}
 
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label for="{{ field.id_for_label }}" class="form-label">
-                                {{ field.label }}
-                            </label>
+                    <!-- Email поле -->
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">
+                            {{ form.username.label }}
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.errors %}
+                            <div class="text-danger">
+                                {% for error in form.username.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
 
-                            <input type="{{ field.widget_type }}"
-                                   name="{{ field.name }}"
-                                   id="{{ field.id_for_label }}"
-                                   class="form-control {% if field.errors %}is-invalid{% endif %}"
-                                   value="{{ field.value|default:'' }}">
-
-                            {% if field.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in field.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
+                    <!-- Пароль поле -->
+                    <div class="mb-3">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">
+                            {{ form.password.label }}
+                        </label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <div class="text-danger">
+                                {% for error in form.password.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">Войти</button>
