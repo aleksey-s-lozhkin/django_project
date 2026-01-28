@@ -1,8 +1,12 @@
+import ssl
+import certifi
 import os
 from pathlib import Path
 
-from django.conf.global_settings import AUTH_USER_MODEL
 from dotenv import load_dotenv
+
+os.environ['SSL_CERT_FILE'] = certifi.where()
+ssl._create_default_https_context = lambda: ssl.create_default_context(cafile=certifi.where())
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -86,9 +90,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-LANGUAGE_CODE = os.getenv('LANGUAGE_CODE', default='Europe/Moscow')
-
-TIME_ZONE = os.getenv('TIME_ZONE', default='ru-ru')
+LANGUAGE_CODE = os.getenv('LANGUAGE_CODE', default='ru-ru')
+TIME_ZONE = os.getenv('TIME_ZONE', default='Europe/Moscow')
 
 USE_I18N = True
 
@@ -100,8 +103,24 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 2 * 1024 * 1024
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+#EMAIL_BACKEND="django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.yandex.ru')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', 465))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'False') == 'True'
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)

@@ -2,11 +2,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
 
-from catalog.apps import CatalogConfig
+from blog.apps import BlogConfig
 
 from . import views
 
-app_name = CatalogConfig.name
+app_name = BlogConfig.name
 
 urlpatterns = [
     path('', views.PostListView.as_view(), name='post_list'),
