@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - Блог Skystore{% endblock %}
+
+{% block content %}
+<div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+    <h1 class="display-4 fw-bold">Skystore</h1>
+    <p class="lead fs-4">Просмотр поста</p>
+</div>
+
+<div class="container">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Главная</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'blog:post_list' %}">Блог</a></li>
+            <li class="breadcrumb-item active">{{ post.title|truncatechars:30 }}</li>
+        </ol>
+    </nav>
+
+    <!-- Сообщения -->
+    {% if messages %}
+    <div class="row mb-4">
+        <div class="col-12">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Информация о посте -->
+    <div class="row mb-4">
+        <div class="col-12">
+            {% if not post.is_published %}
+            <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+                Этот пост еще не опубликован
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endif %}
+
+            <div class="card mb-4 box-shadow">
+                <div class="card-header py-3">
+                    <h2 class="my-0 fw-normal text-center">{{ post.title }}</h2>
+                </div>
+
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-3 mb-4 justify-content-center">
+                        <span class="badge bg-light text-dark border">
+                            Создан: {{ post.created_at|date:"d.m.Y H:i" }}
+                        </span>
+
+                        <span class="badge bg-light text-dark border">
+                            Обновлен: {{ post.updated_at|date:"d.m.Y H:i" }}
+                        </span>
+
+                        <span class="badge bg-light text-dark border">
+                            Просмотров: {{ post.views }}
+                        </span>
+                    </div>
+
+                    <!-- Изображение -->
+                    {% if post.preview %}
+                    <div class="mb-4 text-center">
+                        <img src="{{ post.preview.url }}"
+                             class="img-fluid rounded shadow"
+                             alt="{{ post.title }}"
+                             style="max-height: 400px; object-fit: contain;">
+                    </div>
+                    {% endif %}
+
+                    <!-- Контент -->
+                    <div class="mb-4">
+                        <div class="card border-secondary">
+                            <div class="card-body">
+                                {{ post.content|linebreaks }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Кнопки -->
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                        <a href="{% url 'blog:post_list' %}" class="btn btn-lg btn-outline-secondary">
+                            Назад к списку
+                        </a>
+
+                        <a href="{% url 'blog:post_update' post.pk %}" class="btn btn-lg btn-primary">
+                            Редактировать
+                        </a>
+
+                        <a href="{% url 'blog:post_create' %}" class="btn btn-lg btn-success">
+                            Новый пост
+                        </a>
+
+                        <button type="button" class="btn btn-lg btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteModal">
+                            Удалить
+                        </button>
+
+                        {% if not post.is_published %}
+                        <a href="{% url 'blog:post_publish' post.pk %}" class="btn btn-lg btn-warning">
+                            Опубликовать
+                        </a>
+                        {% else %}
+                        <a href="{% url 'blog:post_unpublish' post.pk %}" class="btn btn-lg btn-warning">
+                            Снять с публикации
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно удаления -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить пост <strong>"{{ post.title }}"</strong>?</p>
+                <p class="text-danger">Это действие нельзя отменить!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form method="post" action="{% url 'blog:post_delete' post.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
