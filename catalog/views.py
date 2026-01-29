@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView
@@ -44,13 +45,14 @@ class ProductListView(ListView):
     ordering = ['-created_at']
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(LoginRequiredMixin, CreateView):
     """Создание нового продукта"""
 
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
     success_url = reverse_lazy('catalog:product_list')
+    login_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
         messages.success(self.request, 'Продукт успешно создан!')
@@ -61,13 +63,14 @@ class ProductCreateView(CreateView):
         return super().form_invalid(form)
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(LoginRequiredMixin, UpdateView):
     """Редактирование существующего продукта"""
 
     model = Product
     form_class = ProductForm
     template_name = 'catalog/product_form.html'
     success_url = reverse_lazy('catalog:product_list')
+    login_url = reverse_lazy('users:login')
 
     def form_valid(self, form):
         messages.success(self.request, 'Продукт успешно обновлен!')
@@ -78,12 +81,13 @@ class ProductUpdateView(UpdateView):
         return super().form_invalid(form)
 
 
-class ProductDeleteView(DeleteView):
+class ProductDeleteView(LoginRequiredMixin, DeleteView):
     """Удаление продукта"""
 
     model = Product
     template_name = 'catalog/product_confirm_delete.html'
     success_url = reverse_lazy('catalog:product_list')
+    login_url = reverse_lazy('users:login')
 
     def delete(self, request, *args, **kwargs):
         messages.success(self.request, 'Продукт успешно удален!')

@@ -23,31 +23,19 @@ class ProductForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['name'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Введите название продукта'
-        })
+        self.fields['name'].widget.attrs.update({'class': 'form-control', 'placeholder': 'Введите название продукта'})
 
-        self.fields['description'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': 'Введите описание продукта',
-            'rows': 4
-        })
+        self.fields['description'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Введите описание продукта', 'rows': 4}
+        )
 
-        self.fields['category'].widget.attrs.update({
-            'class': 'form-select'
-        })
+        self.fields['category'].widget.attrs.update({'class': 'form-select'})
 
-        self.fields['price'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': '0.00',
-            'step': '0.01',
-            'min': '0'
-        })
+        self.fields['price'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': '0'}
+        )
 
-        self.fields['image'].widget.attrs.update({
-            'class': 'form-control'
-        })
+        self.fields['image'].widget.attrs.update({'class': 'form-control'})
 
     def clean_name(self):
         """Валидация названия продукта"""
