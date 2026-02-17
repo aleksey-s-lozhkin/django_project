@@ -1,6 +1,5 @@
-from django.db import models
 from django.conf import settings
-
+from django.db import models
 
 """
 Модели приложения каталога.
@@ -39,7 +38,7 @@ class Product(models.Model):
         null=True,
         blank=True,
         verbose_name='Автор',
-        related_name='products'
+        related_name='products',
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата последнего изменения')

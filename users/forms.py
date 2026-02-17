@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
@@ -80,18 +80,11 @@ class UserRegistrationForm(UserCreationForm):
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(
         label='Email',
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'example@mail.com',
-            'autofocus': True
-        }),
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'example@mail.com', 'autofocus': True}),
     )
     password = forms.CharField(
         label='Пароль',
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': 'Введите пароль'
-        }),
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Введите пароль'}),
     )
 
     def clean(self):
@@ -106,30 +99,17 @@ class CustomAuthenticationForm(AuthenticationForm):
             try:
                 user = User.objects.get(email=username)
             except User.DoesNotExist:
-                raise ValidationError(
-                    'Пользователь с таким email не найден.',
-                    code='invalid_login'
-                )
+                raise ValidationError('Пользователь с таким email не найден.', code='invalid_login')
 
             # Проверяем пароль
             if not user.check_password(password):
-                raise ValidationError(
-                    'Неверный пароль.',
-                    code='invalid_login'
-                )
+                raise ValidationError('Неверный пароль.', code='invalid_login')
 
             # Аутентифицируем
-            self.user_cache = authenticate(
-                self.request,
-                username=user.email,
-                password=password
-            )
+            self.user_cache = authenticate(self.request, username=user.email, password=password)
 
             if self.user_cache is None:
-                raise ValidationError(
-                    'Ошибка аутентификации.',
-                    code='invalid_login'
-                )
+                raise ValidationError('Ошибка аутентификации.', code='invalid_login')
 
             self.confirm_login_allowed(self.user_cache)
 

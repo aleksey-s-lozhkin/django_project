@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView, View
 
-from catalog.forms import ProductForm, ModeratorProductForm
+from catalog.forms import ModeratorProductForm, ProductForm
 from catalog.models import Contact, Product
 
 
@@ -58,11 +58,7 @@ class ProductListView(ListView):
             pass  # Модераторы видят все продукты
         else:
             # Обычные пользователи видят только опубликованные и свои продукты
-            queryset = queryset.filter(
-                is_published=True
-            ) | queryset.filter(
-                author=self.request.user
-            )
+            queryset = queryset.filter(is_published=True) | queryset.filter(author=self.request.user)
 
         return queryset.order_by('-created_at')
 
@@ -183,11 +179,7 @@ class ProductDetailView(DetailView):
             pass  # Модераторы видят все продукты
         else:
             # Обычные пользователи видят опубликованные или свои продукты
-            queryset = queryset.filter(
-                is_published=True
-            ) | queryset.filter(
-                author=self.request.user
-            )
+            queryset = queryset.filter(is_published=True) | queryset.filter(author=self.request.user)
 
         return queryset
 

@@ -25,28 +25,22 @@ class BaseProductForm(forms.ModelForm):
 
         # Базовые настройки полей, которые есть во всех формах
         if 'name' in self.fields:
-            self.fields['name'].widget.attrs.update({
-                'class': 'form-control',
-                'placeholder': 'Введите название продукта'
-            })
+            self.fields['name'].widget.attrs.update(
+                {'class': 'form-control', 'placeholder': 'Введите название продукта'}
+            )
 
         if 'description' in self.fields:
-            self.fields['description'].widget.attrs.update({
-                'class': 'form-control',
-                'placeholder': 'Введите описание продукта',
-                'rows': 4
-            })
+            self.fields['description'].widget.attrs.update(
+                {'class': 'form-control', 'placeholder': 'Введите описание продукта', 'rows': 4}
+            )
 
         if 'category' in self.fields:
             self.fields['category'].widget.attrs.update({'class': 'form-select'})
 
         if 'price' in self.fields:
-            self.fields['price'].widget.attrs.update({
-                'class': 'form-control',
-                'placeholder': '0.00',
-                'step': '0.01',
-                'min': '0'
-            })
+            self.fields['price'].widget.attrs.update(
+                {'class': 'form-control', 'placeholder': '0.00', 'step': '0.01', 'min': '0'}
+            )
 
         if 'image' in self.fields:
             self.fields['image'].widget.attrs.update({'class': 'form-control'})
