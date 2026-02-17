@@ -1,3 +1,5 @@
+[file name]: product_form.html
+[file content begin]
 {% extends 'base.html' %}
 
 {% block title %}
@@ -17,6 +19,14 @@
                             Создание нового продукта
                         {% endif %}
                     </h2>
+                    <!-- Информация о статусе для модераторов -->
+                    {% if object and user.is_authenticated and user.groups.filter.name == "Модераторы" %}
+                    <div class="mt-2">
+                        <span class="badge {% if object.is_published %}bg-success{% else %}bg-warning{% endif %}">
+                            {% if object.is_published %}Опубликовано{% else %}Черновик{% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="card-body">
                     <form method="post" enctype="multipart/form-data">
@@ -116,6 +126,29 @@
                             {% endif %}
                             <div class="form-text">JPG, PNG до 5 МБ.</div>
                         </div>
+
+                        <!-- Поле is_published для модераторов -->
+                        {% if form.is_published %}
+                        <div class="mb-3 form-check">
+                            {{ form.is_published }}
+                            <label class="form-check-label" for="{{ form.is_published.id_for_label }}">
+                                {{ form.is_published.label }}
+                            </label>
+                            <div class="form-text">
+                                Отметьте, чтобы сделать продукт видимым для всех пользователей.
+                                {% if not object.is_published and user.groups.filter.name == "Модераторы" %}
+                                <span class="text-warning fw-bold">Продукт сейчас скрыт!</span>
+                                {% endif %}
+                            </div>
+                            {% if form.is_published.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.is_published.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary me-md-2">
