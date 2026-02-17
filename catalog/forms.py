@@ -14,7 +14,7 @@ class BaseProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = []  # Будет переопределено в наследниках
+        fields = []
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'category': forms.Select(attrs={'class': 'form-select'}),

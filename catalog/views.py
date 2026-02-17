@@ -55,7 +55,7 @@ class ProductListView(ListView):
             queryset = queryset.filter(is_published=True)
         # Модераторы видят все
         elif self.request.user.groups.filter(name='moderator').exists():
-            pass  # Модераторы видят все продукты
+            pass
         else:
             # Обычные пользователи видят только опубликованные и свои продукты
             queryset = queryset.filter(is_published=True) | queryset.filter(author=self.request.user)
@@ -176,7 +176,7 @@ class ProductDetailView(DetailView):
             queryset = queryset.filter(is_published=True)
         # Модераторы видят все
         elif self.request.user.groups.filter(name='moderator').exists():
-            pass  # Модераторы видят все продукты
+            pass
         else:
             # Обычные пользователи видят опубликованные или свои продукты
             queryset = queryset.filter(is_published=True) | queryset.filter(author=self.request.user)
