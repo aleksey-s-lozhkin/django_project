@@ -114,7 +114,7 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         user = self.request.user
 
         # Модераторы могут редактировать все
-        if user.groups.filter(name='Модераторы').exists():
+        if user.groups.filter(name='moderator').exists():
             return True
 
         # Авторы могут редактировать свои продукты

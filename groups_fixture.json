@@ -1,0 +1,38 @@
+[
+{
+    "model": "auth.group",
+    "fields": {
+        "name": "moderator",
+        "permissions": [
+            ["delete_product", "catalog", "product"],
+            ["change_product", "catalog", "product"],
+            ["can_unpublish_product", "catalog", "product"]
+        ]
+    }
+},
+{
+    "model": "auth.group",
+    "fields": {
+        "name": "admin",
+        "permissions": [
+            ["add_user", "users", "user"],
+            ["change_user", "users", "user"],
+            ["delete_user", "users", "user"],
+            ["view_user", "users", "user"],
+            ["add_product", "catalog", "product"],
+            ["change_product", "catalog", "product"],
+            ["delete_product", "catalog", "product"],
+            ["view_product", "catalog", "product"],
+            ["add_category", "catalog", "category"],
+            ["change_category", "catalog", "category"],
+            ["delete_category", "catalog", "category"],
+            ["view_category", "catalog", "category"],
+            ["can_unpublish_product", "catalog", "product"],
+            ["add_post", "blog", "post"],
+            ["change_post", "blog", "post"],
+            ["delete_post", "blog", "post"],
+            ["view_post", "blog", "post"]
+        ]
+    }
+}
+]
