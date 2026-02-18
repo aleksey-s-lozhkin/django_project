@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 """
@@ -6,7 +7,7 @@ from django.db import models
 Содержит три модели:
 - Category: категория товаров с названием и описанием.
 - Product: продукт с названием, описанием, изображением, ссылкой на категорию,
-  ценой и временными метками создания/обновления.
+  ценой, автором и временными метками создания/обновления.
 - Contact: контактные данные компании.
 """
 
@@ -30,6 +31,15 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/%Y/%m/', verbose_name='Изображение', blank=True, null=True)
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='products')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена за покупку')
+    is_published = models.BooleanField(default=False, verbose_name='Опубликовано')
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name='Автор',
+        related_name='products',
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата последнего изменения')
 
@@ -40,6 +50,9 @@ class Product(models.Model):
         verbose_name = 'продукт'
         verbose_name_plural = 'продукты'
         ordering = ['name']
+        permissions = [
+            ('can_unpublish_product', 'Can unpublish product'),
+        ]
 
 
 class Contact(models.Model):

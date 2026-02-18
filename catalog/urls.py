@@ -11,12 +11,16 @@ from .views import (
     ProductDeleteView,
     ProductDetailView,
     ProductListView,
+    ProductModerationListView,
+    ProductPublishView,
+    ProductUnpublishView,
     ProductUpdateView,
 )
 
 app_name = CatalogConfig.name
 
 urlpatterns = [
+    # Основные страницы
     path('', HomeView.as_view(), name='home'),
     path('contacts/', ContactsView.as_view(), name='contacts'),
     # CRUD для продуктов
@@ -25,6 +29,10 @@ urlpatterns = [
     path('products/<int:pk>/', ProductDetailView.as_view(), name='product_detail'),
     path('products/<int:pk>/update/', ProductUpdateView.as_view(), name='product_update'),
     path('products/<int:pk>/delete/', ProductDeleteView.as_view(), name='product_delete'),
+    # Модерация продуктов (НОВЫЕ URL)
+    path('products/<int:pk>/publish/', ProductPublishView.as_view(), name='product_publish'),
+    path('products/<int:pk>/unpublish/', ProductUnpublishView.as_view(), name='product_unpublish'),
+    path('moderation/', ProductModerationListView.as_view(), name='product_moderation'),
 ]
 
 if settings.DEBUG:

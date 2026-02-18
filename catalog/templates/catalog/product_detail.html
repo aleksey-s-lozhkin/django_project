@@ -9,8 +9,15 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-start mb-3">
-                        <h1 class="card-title">{{ product.name }}</h1>
-                        {% if user.is_authenticated %}
+                        <div>
+                            <h1 class="card-title">{{ product.name }}</h1>
+                            <!-- Статус публикации -->
+                            {% if not product.is_published %}
+                                <span class="badge bg-warning">Черновик</span>
+                            {% endif %}
+                        </div>
+                        <!-- Кнопки действий с проверкой прав -->
+                        {% if can_edit %}
                         <div class="btn-group" role="group">
                             <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning btn-sm">
                                 <i class="bi bi-pencil"></i> Изменить
@@ -21,6 +28,39 @@
                         </div>
                         {% endif %}
                     </div>
+
+                    <!-- Информация о статусе для модераторов -->
+                    {% if is_moderator %}
+                    <div class="alert alert-info py-2 mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Статус публикации:</strong> 
+                                {% if product.is_published %}
+                                    <span class="badge bg-success">Опубликовано</span>
+                                {% else %}
+                                    <span class="badge bg-warning">Черновик</span>
+                                {% endif %}
+                            </div>
+                            <div class="btn-group">
+                                {% if not product.is_published %}
+                                <form method="post" action="{% url 'catalog:product_publish' product.pk %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="bi bi-check-circle"></i> Опубликовать
+                                    </button>
+                                </form>
+                                {% else %}
+                                <form method="post" action="{% url 'catalog:product_unpublish' product.pk %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-x-circle"></i> Снять с публикации
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
 
                     <div class="row mb-4">
                         <div class="col-md-6">
@@ -36,6 +76,12 @@
                                 <i class="bi bi-arrow-clockwise"></i> Обновлен:
                                 {{ product.updated_at|date:"d.m.Y" }}
                             </p>
+                            {% if product.author %}
+                            <p class="text-muted">
+                                <i class="bi bi-person"></i> Автор:
+                                <strong>{{ product.author.email }}</strong>
+                            </p>
+                            {% endif %}
                         </div>
                         <div class="col-md-6 text-end">
                             <h2 class="text-primary">{{ product.price }} ₽</h2>
@@ -61,6 +107,12 @@
                         <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Вернуться к списку
                         </a>
+                        <!-- Ссылка для модераторов на панель модерации -->
+                        {% if is_moderator %}
+                        <a href="{% url 'catalog:product_moderation' %}" class="btn btn-info">
+                            <i class="bi bi-shield-check"></i> Панель модерации
+                        </a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
