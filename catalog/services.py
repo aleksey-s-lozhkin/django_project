@@ -2,7 +2,8 @@ from django.core.cache import cache
 from django.db.models import QuerySet
 
 from config.settings import CACHE_ENABLE
-from .models import Product, Category
+
+from .models import Category, Product
 
 
 def get_product_from_cache():
@@ -14,18 +15,18 @@ def get_product_from_cache():
     """
     if not CACHE_ENABLE:
         products = Product.objects.all()
-        products.from_cache = False  # Добавляем атрибут
+        products.from_cache = False
         return products
 
     key = 'product_list'
 
     products = cache.get(key)
     if products is not None:
-        products.from_cache = True  # Добавляем атрибут
+        products.from_cache = True
         return products
 
     products = Product.objects.all()
-    products.from_cache = False  # Добавляем атрибут
+    products.from_cache = False
     cache.set(key, products, timeout=3600)
 
     return products
@@ -61,7 +62,7 @@ def get_products_by_category_cached(category_id: int, user=None) -> tuple[QueryS
     products = get_products_by_category(category_id)
 
     # Сохраняем в кэш
-    cache.set(cache_key, products, timeout=60*15)  # 15 минут
+    cache.set(cache_key, products, timeout=60 * 15)  # 15 минут
 
     return products, False
 

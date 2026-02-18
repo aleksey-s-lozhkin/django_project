@@ -6,6 +6,7 @@ from django.views.decorators.cache import cache_page
 from catalog.apps import CatalogConfig
 
 from .views import (
+    CategoryProductsView,
     ContactsView,
     HomeView,
     ProductCreateView,
@@ -16,7 +17,6 @@ from .views import (
     ProductPublishView,
     ProductUnpublishView,
     ProductUpdateView,
-    CategoryProductsView,
 )
 
 app_name = CatalogConfig.name

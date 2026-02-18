@@ -22,9 +22,16 @@ class UserAdmin(BaseUserAdmin):
     form = CustomUserChangeForm
     add_form = CustomUserCreationForm
 
-    list_display = ('id', 'email', 'is_staff', 'is_active', 'date_joined')
+    list_display = (
+        'id',
+        'email',
+        'get_role',
+        'is_staff',
+        'is_active',
+    )
     list_display_links = ('id', 'email')
-    search_fields = ('email',)
+    list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
+    search_fields = ('email', 'first_name', 'last_name')
     ordering = ('email',)
 
     fieldsets = (
@@ -43,3 +50,13 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
+
+    def get_role(self, obj):
+        """Определяет роль пользователя"""
+        if obj.is_superuser:
+            return "Администратор"
+        elif obj.groups.filter(name='moderator').exists():
+            return "Модератор"
+        else:
+            return "Пользователь"
+    get_role.short_description = 'Роль'

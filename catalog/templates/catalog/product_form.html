@@ -129,7 +129,7 @@
                             <div class="form-text">JPG, PNG до 5 МБ.</div>
                         </div>
 
-                        <!-- Поле is_published для модераторов - ИСПРАВЛЕНО -->
+                        <!-- Поле is_published для модераторов -->
                         {% if user.is_authenticated and user.groups.filter.exists and user.groups.filter.name == "Модераторы" %}
                         <div class="mb-3 form-check">
                             {{ form.is_published }}

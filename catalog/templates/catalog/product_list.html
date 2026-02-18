@@ -93,7 +93,7 @@
                             <!-- Описание -->
                             <p class="card-text mb-3">{{ product.description|truncatechars:100 }}</p>
 
-                            <!-- Дополнительная информация с КЛИКАБЕЛЬНОЙ категорией -->
+                            <!-- Дополнительная информация -->
                             <div class="mb-3">
                                 <p class="mb-1 text-muted small">
                                     <i class="bi bi-tag"></i>
@@ -234,7 +234,7 @@
 <!-- Индикатор источника данных (только для отладки) -->
 {% if debug %}
 <div style="position: fixed; bottom: 20px; right: 20px; padding: 8px 12px; background: {% if from_cache %}#4CAF50{% else %}#f44336{% endif %}; color: white; border-radius: 20px; font-size: 14px; font-weight: bold; z-index: 9999; opacity: 0.9;">
-    {% if from_cache %}⚡ КЭШ{% else %}📦 БД{% endif %}
+    {% if from_cache %}КЭШ{% else %}БД{% endif %}
 </div>
 {% endif %}
 
