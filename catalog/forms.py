@@ -14,11 +14,14 @@ class BaseProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = []
+        # Пустой fields - это нормально для абстрактной формы
+        fields = []  # ДОЛЖНО БЫТЬ ПУСТО!
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'category': forms.Select(attrs={'class': 'form-select'}),
         }
+        # Указываем, что это абстрактная форма
+        abstract = True
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,39 +50,34 @@ class BaseProductForm(forms.ModelForm):
 
     def clean_name(self):
         """Валидация названия продукта"""
-        if 'name' in self.cleaned_data:
-            name = self.cleaned_data.get('name', '').lower()
-
+        name = self.cleaned_data.get('name', '')
+        if name:
+            name_lower = name.lower()
             for forbidden_word in self.FORBIDDEN_WORDS:
-                if forbidden_word in name:
+                if forbidden_word in name_lower:
                     raise ValidationError(f'Название содержит запрещенное слово: "{forbidden_word}"')
-
-        return self.cleaned_data.get('name')
+        return name
 
     def clean_description(self):
         """Валидация описания продукта"""
-        if 'description' in self.cleaned_data:
-            description = self.cleaned_data.get('description', '').lower()
-
+        description = self.cleaned_data.get('description', '')
+        if description:
+            desc_lower = description.lower()
             for forbidden_word in self.FORBIDDEN_WORDS:
-                if forbidden_word in description:
+                if forbidden_word in desc_lower:
                     raise ValidationError(f'Описание содержит запрещенное слово: "{forbidden_word}"')
-
-        return self.cleaned_data.get('description')
+        return description
 
     def clean_price(self):
         """Валидация цены продукта"""
         price = self.cleaned_data.get('price')
-
         if price is not None and price < 0:
             raise ValidationError('Цена не может быть отрицательной')
-
         return price
 
     def clean_image(self):
         """Валидация изображения"""
         image = self.cleaned_data.get('image')
-
         if image:
             if image.size > 5 * 1024 * 1024:
                 raise ValidationError('Размер изображения не должен превышать 5 МБ')
@@ -87,7 +85,6 @@ class BaseProductForm(forms.ModelForm):
             ext = os.path.splitext(image.name)[1].lower()
             if ext not in allowed_extensions:
                 raise ValidationError('Допустимые форматы изображений: JPG, JPEG, PNG')
-
         return image
 
 
@@ -95,18 +92,17 @@ class ProductForm(BaseProductForm):
     """Форма для создания и редактирования продуктов обычными пользователями"""
 
     class Meta(BaseProductForm.Meta):
-        fields = ['name', 'description', 'image', 'category', 'price']
+        fields = ['name', 'description', 'category', 'price', 'image']
 
 
 class ModeratorProductForm(BaseProductForm):
     """Форма для модератора с дополнительным полем статуса публикации"""
 
     class Meta(BaseProductForm.Meta):
-        fields = BaseProductForm.Meta.fields + ['is_published']
+        fields = ['name', 'description', 'category', 'price', 'image', 'is_published']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Добавляем CSS-класс для поля is_published
         if 'is_published' in self.fields:
             self.fields['is_published'].widget.attrs.update({'class': 'form-check-input'})
 
@@ -116,21 +112,20 @@ class ProductCreateForm(BaseProductForm):
 
     class Meta(BaseProductForm.Meta):
         fields = ['name', 'description', 'category', 'price']
-        # При создании можно не требовать изображение сразу
 
 
 class ProductUpdateForm(BaseProductForm):
     """Форма только для обновления продукта"""
 
     class Meta(BaseProductForm.Meta):
-        fields = ['name', 'description', 'image', 'category', 'price']
+        fields = ['name', 'description', 'category', 'price', 'image']
 
 
 class ModeratorProductUpdateForm(BaseProductForm):
     """Форма для обновления продукта модератором"""
 
     class Meta(BaseProductForm.Meta):
-        fields = ['name', 'description', 'image', 'category', 'price', 'is_published']
+        fields = ['name', 'description', 'category', 'price', 'image', 'is_published']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

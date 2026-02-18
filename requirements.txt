@@ -159,6 +159,9 @@ psycopg2-binary==2.9.11 ; python_version >= "3.12" and python_version < "4.0" \
 python-dotenv==1.2.1 ; python_version >= "3.12" and python_version < "4.0" \
     --hash=sha256:42667e897e16ab0d66954af0e60a9caa94f0fd4ecf3aaf6d2d260eec1aa36ad6 \
     --hash=sha256:b81ee9561e9ca4004139c6cbba3a238c32b03e4894671e181b671e8cb8425d61
+redis==7.2.0 ; python_version >= "3.12" and python_version < "4.0" \
+    --hash=sha256:01f591f8598e483f1842d429e8ae3a820804566f1c73dca1b80e23af9fba0497 \
+    --hash=sha256:4dd5bf4bd4ae80510267f14185a15cba2a38666b941aff68cccf0256b51c1f26
 sqlparse==0.5.5 ; python_version >= "3.12" and python_version < "4.0" \
     --hash=sha256:12a08b3bf3eec877c519589833aed092e2444e68240a3577e8e26148acc7b1ba \
     --hash=sha256:e20d4a9b0b8585fdf63b10d30066c7c94c5d7a7ec47c889a2d83a3caa93ff28e

@@ -1,9 +1,7 @@
-[file name]: product_form.html
-[file content begin]
 {% extends 'base.html' %}
 
 {% block title %}
-    {% if object %}Редактирование продукта{% else %}Создание продукта{% endif %}
+{% if object %}Редактирование продукта{% else %}Создание продукта{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -14,18 +12,22 @@
                 <div class="card-header">
                     <h2 class="mb-0">
                         {% if object %}
-                            Редактирование продукта
+                        Редактирование продукта
                         {% else %}
-                            Создание нового продукта
+                        Создание нового продукта
                         {% endif %}
                     </h2>
                     <!-- Информация о статусе для модераторов -->
-                    {% if object and user.is_authenticated and user.groups.filter.name == "Модераторы" %}
+                    {% if object and user.is_authenticated %}
+                    {% if user.groups.filter.exists %}
+                    {% if user.groups.filter.name == "Модераторы" %}
                     <div class="mt-2">
-                        <span class="badge {% if object.is_published %}bg-success{% else %}bg-warning{% endif %}">
-                            {% if object.is_published %}Опубликовано{% else %}Черновик{% endif %}
-                        </span>
+                                    <span class="badge {% if object.is_published %}bg-success{% else %}bg-warning{% endif %}">
+                                        {% if object.is_published %}Опубликовано{% else %}Черновик{% endif %}
+                                    </span>
                     </div>
+                    {% endif %}
+                    {% endif %}
                     {% endif %}
                 </div>
                 <div class="card-body">
@@ -33,11 +35,11 @@
                         {% csrf_token %}
 
                         {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                                {% for error in form.non_field_errors %}
-                                    {{ error }}
-                                {% endfor %}
-                            </div>
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
                         {% endif %}
 
                         <div class="mb-3">
@@ -46,11 +48,11 @@
                             </label>
                             {{ form.name }}
                             {% if form.name.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.name.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
+                            <div class="text-danger">
+                                {% for error in form.name.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
                             {% endif %}
                             <div class="form-text">Название не должно содержать запрещенных слов.</div>
                         </div>
@@ -61,11 +63,11 @@
                             </label>
                             {{ form.description }}
                             {% if form.description.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.description.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
+                            <div class="text-danger">
+                                {% for error in form.description.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
                             {% endif %}
                             <div class="form-text">Описание не должно содержать запрещенных слов.</div>
                         </div>
@@ -77,11 +79,11 @@
                                 </label>
                                 {{ form.category }}
                                 {% if form.category.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.category.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
+                                <div class="text-danger">
+                                    {% for error in form.category.errors %}
+                                    <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
                             </div>
 
@@ -94,11 +96,11 @@
                                     <span class="input-group-text">₽</span>
                                 </div>
                                 {% if form.price.errors %}
-                                    <div class="text-danger">
-                                        {% for error in form.price.errors %}
-                                            <small>{{ error }}</small>
-                                        {% endfor %}
-                                    </div>
+                                <div class="text-danger">
+                                    {% for error in form.price.errors %}
+                                    <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
                                 <div class="form-text">Цена должна быть положительной.</div>
                             </div>
@@ -110,25 +112,25 @@
                             </label>
                             {{ form.image }}
                             {% if form.image.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.image.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
+                            <div class="text-danger">
+                                {% for error in form.image.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
                             {% endif %}
                             {% if object.image %}
-                                <div class="mt-2">
-                                    <small class="text-muted">Текущее изображение:</small>
-                                    <div class="mt-1">
-                                        <img src="{{ object.image.url }}" alt="{{ object.name }}" class="img-thumbnail">
-                                    </div>
+                            <div class="mt-2">
+                                <small class="text-muted">Текущее изображение:</small>
+                                <div class="mt-1">
+                                    <img src="{{ object.image.url }}" alt="{{ object.name }}" class="img-thumbnail">
                                 </div>
+                            </div>
                             {% endif %}
                             <div class="form-text">JPG, PNG до 5 МБ.</div>
                         </div>
 
                         <!-- Поле is_published для модераторов -->
-                        {% if form.is_published %}
+                        {% if user.is_authenticated and user.groups.filter.exists and user.groups.filter.name == "Модераторы" %}
                         <div class="mb-3 form-check">
                             {{ form.is_published }}
                             <label class="form-check-label" for="{{ form.is_published.id_for_label }}">
@@ -136,16 +138,17 @@
                             </label>
                             <div class="form-text">
                                 Отметьте, чтобы сделать продукт видимым для всех пользователей.
-                                {% if not object.is_published and user.groups.filter.name == "Модераторы" %}
+                                {% if object and not object.is_published %}
                                 <span class="text-warning fw-bold">Продукт сейчас скрыт!</span>
                                 {% endif %}
                             </div>
+
                             {% if form.is_published.errors %}
-                                <div class="text-danger">
-                                    {% for error in form.is_published.errors %}
-                                        <small>{{ error }}</small>
-                                    {% endfor %}
-                                </div>
+                            <div class="text-danger">
+                                {% for error in form.is_published.errors %}
+                                <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
                             {% endif %}
                         </div>
                         {% endif %}

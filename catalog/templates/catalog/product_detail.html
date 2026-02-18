@@ -19,10 +19,10 @@
                         <!-- Кнопки действий с проверкой прав -->
                         {% if can_edit %}
                         <div class="btn-group" role="group">
-                            <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning btn-sm">
+                            <a href="{% url 'catalog:product_update' product.id %}" class="btn btn-warning btn-sm">
                                 <i class="bi bi-pencil"></i> Изменить
                             </a>
-                            <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger btn-sm">
+                            <a href="{% url 'catalog:product_delete' product.id %}" class="btn btn-danger btn-sm">
                                 <i class="bi bi-trash"></i> Удалить
                             </a>
                         </div>
@@ -43,14 +43,14 @@
                             </div>
                             <div class="btn-group">
                                 {% if not product.is_published %}
-                                <form method="post" action="{% url 'catalog:product_publish' product.pk %}" style="display: inline;">
+                                <form method="post" action="{% url 'catalog:product_publish' product.id %}" style="display: inline;">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-success btn-sm">
                                         <i class="bi bi-check-circle"></i> Опубликовать
                                     </button>
                                 </form>
                                 {% else %}
-                                <form method="post" action="{% url 'catalog:product_unpublish' product.pk %}" style="display: inline;">
+                                <form method="post" action="{% url 'catalog:product_unpublish' product.id %}" style="display: inline;">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-warning btn-sm">
                                         <i class="bi bi-x-circle"></i> Снять с публикации
