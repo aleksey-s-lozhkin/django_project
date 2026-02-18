@@ -16,6 +16,7 @@ from .views import (
     ProductPublishView,
     ProductUnpublishView,
     ProductUpdateView,
+    CategoryProductsView,
 )
 
 app_name = CatalogConfig.name
@@ -34,6 +35,7 @@ urlpatterns = [
     path('products/<int:pk>/publish/', ProductPublishView.as_view(), name='product_publish'),
     path('products/<int:pk>/unpublish/', ProductUnpublishView.as_view(), name='product_unpublish'),
     path('moderation/', ProductModerationListView.as_view(), name='product_moderation'),
+    path('category/<int:category_id>/', CategoryProductsView.as_view(), name='category_products'),
 ]
 
 if settings.DEBUG:

@@ -1,15 +1,14 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.cache import cache
-from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView, View
 
 from django.conf import settings
 from catalog.forms import ModeratorProductForm, ProductForm
-from catalog.models import Contact, Product
-from catalog.services import get_product_from_cache
+from catalog.models import Contact, Product, Category
+from catalog.services import get_product_from_cache, get_products_by_category_cached
 
 
 class HomeView(ListView):
@@ -303,4 +302,47 @@ class ProductModerationListView(ModeratorRequiredMixin, ListView):
         context['published_count'] = Product.objects.filter(is_published=True).count()
         context['draft_count'] = Product.objects.filter(is_published=False).count()
         context['current_status'] = self.request.GET.get('status', 'draft')
+        return context
+
+class CategoryProductsView(ListView):
+    """Список продуктов в конкретной категории"""
+
+    model = Product
+    template_name = 'catalog/category_products.html'
+    context_object_name = 'products'
+    paginate_by = 10
+
+    def get_queryset(self):
+        """Получает продукты в категории с кэшированием"""
+        category_id = self.kwargs.get('category_id')
+
+        # Получаем продукты в категории
+        products, from_cache = get_products_by_category_cached(
+            category_id,
+            user=self.request.user
+        )
+
+        # Сохраняем информацию об источнике
+        self.from_cache = from_cache
+
+        # Применяем фильтрацию по правам доступа
+        if not self.request.user.is_authenticated:
+            return products.filter(is_published=True)
+        elif self.request.user.groups.filter(name='moderator').exists():
+            return products
+        else:
+            return products.filter(
+                is_published=True
+            ) | products.filter(author=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Получаем информацию о категории
+        category_id = self.kwargs.get('category_id')
+        category = get_object_or_404(Category, id=category_id)
+
+        context['category'] = category
+        context['from_cache'] = getattr(self, 'from_cache', False)
+
         return context
