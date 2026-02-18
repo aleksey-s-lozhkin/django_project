@@ -1,11 +1,15 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.cache import cache
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, TemplateView, UpdateView, View
 
+from django.conf import settings
 from catalog.forms import ModeratorProductForm, ProductForm
 from catalog.models import Contact, Product
+from catalog.services import get_product_from_cache
 
 
 class HomeView(ListView):
@@ -47,20 +51,40 @@ class ProductListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        """Разные наборы продуктов для разных пользователей"""
-        queryset = Product.objects.all()
+        """
+        Получает кэшированный список продуктов и применяет фильтрацию по правам доступа.
+        """
+        # Получаем все продукты из кэша или БД
+        all_products = get_product_from_cache()
 
-        # Анонимные пользователи видят только опубликованные
+        # Сохраняем информацию об источнике данных
+        # (нужно добавить атрибут к объекту, чтобы передать в контекст)
+        self.from_cache = getattr(all_products, 'from_cache', False)
+
+        # Применяем фильтрацию в зависимости от прав пользователя
         if not self.request.user.is_authenticated:
-            queryset = queryset.filter(is_published=True)
-        # Модераторы видят все
+            # Анонимные пользователи видят только опубликованные
+            return all_products.filter(is_published=True)
         elif self.request.user.groups.filter(name='moderator').exists():
-            pass
+            # Модераторы видят все
+            return all_products
         else:
-            # Обычные пользователи видят только опубликованные и свои продукты
-            queryset = queryset.filter(is_published=True) | queryset.filter(author=self.request.user)
+            # Обычные пользователи видят опубликованные и свои
+            return all_products.filter(is_published=True) | all_products.filter(author=self.request.user)
 
-        return queryset.order_by('-created_at')
+    def get_context_data(self, **kwargs):
+        """
+        Добавляет в контекст дополнительную информацию.
+        """
+        context = super().get_context_data(**kwargs)
+
+        # Добавляем информацию об источнике данных
+        context['from_cache'] = getattr(self, 'from_cache', False)
+
+        # Добавляем флаг отладки из настроек Django
+        context['debug'] = settings.DEBUG
+
+        return context
 
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
@@ -82,6 +106,10 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         product = form.save(commit=False)
         product.author = self.request.user
         product.save()
+
+        # Очищаем кэш после создания
+        cache.delete('product_list')
+
         messages.success(self.request, 'Продукт успешно создан!')
         return super().form_valid(form)
 
@@ -122,6 +150,9 @@ class ProductUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return redirect(reverse_lazy('catalog:product_list'))
 
     def form_valid(self, form):
+        # Очищаем кэш после обновления
+        cache.delete('product_list')
+
         messages.success(self.request, 'Продукт успешно обновлен!')
         return super().form_valid(form)
 
@@ -156,6 +187,9 @@ class ProductDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return redirect(reverse_lazy('catalog:product_list'))
 
     def delete(self, request, *args, **kwargs):
+        # Очищаем кэш перед удалением
+        cache.delete('product_list')
+
         messages.success(self.request, 'Продукт успешно удален!')
         return super().delete(request, *args, **kwargs)
 
@@ -221,6 +255,10 @@ class ProductPublishView(ModeratorRequiredMixin, View):
         product = get_object_or_404(Product, pk=pk)
         product.is_published = True
         product.save()
+
+        # Очищаем кэш после изменения статуса
+        cache.delete('product_list')
+
         messages.success(request, f'Продукт "{product.name}" опубликован!')
         return redirect('catalog:product_detail', pk=pk)
 
@@ -232,6 +270,10 @@ class ProductUnpublishView(ModeratorRequiredMixin, View):
         product = get_object_or_404(Product, pk=pk)
         product.is_published = False
         product.save()
+
+        # Очищаем кэш после изменения статуса
+        cache.delete('product_list')
+
         messages.success(request, f'Продукт "{product.name}" снят с публикации!')
         return redirect('catalog:product_detail', pk=pk)
 

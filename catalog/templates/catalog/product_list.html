@@ -3,6 +3,7 @@
 {% block title %}Все продукты - Skystore{% endblock %}
 
 {% block content %}
+
 <main>
     <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
         <h1 class="display-4 fw-bold">Все продукты</h1>
@@ -11,9 +12,9 @@
         <!-- Кнопки действий -->
         <div class="mt-4">
             {% if user.is_authenticated %}
-                <a href="{% url 'catalog:product_create' %}" class="btn btn-success btn-lg">
-                    <i class="bi bi-plus-circle"></i> Добавить продукт
-                </a>
+            <a href="{% url 'catalog:product_create' %}" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle"></i> Добавить продукт
+            </a>
             {% endif %}
             <a href="{% url 'catalog:home' %}" class="btn btn-outline-primary btn-lg ms-2">
                 <i class="bi bi-house"></i> На главную
@@ -27,7 +28,7 @@
             <h2 class="text-center mb-0">Найдено продуктов: {{ page_obj.paginator.count }}</h2>
             <div class="text-muted">
                 {% if page_obj.paginator.num_pages > 1 %}
-                    Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
                 {% endif %}
             </div>
         </div>
@@ -42,28 +43,33 @@
                         <!-- Заголовок карточки -->
                         <div class="card-header py-3 position-relative">
                             <h5 class="my-0 fw-normal text-center" style="padding-right: 70px;">
-                                <a href="{% url 'catalog:product_detail' product.pk %}" class="text-decoration-none text-dark">
+                                {% if product.id %}
+                                <a href="{% url 'catalog:product_detail' product.id %}"
+                                   class="text-decoration-none text-dark">
                                     {{ product.name|truncatechars:30 }}
                                 </a>
+                                {% else %}
+                                <span class="text-decoration-none text-dark">{{ product.name|truncatechars:30 }}</span>
+                                {% endif %}
                             </h5>
 
                             <!-- Бейдж статуса справа в заголовке -->
                             {% if user.is_authenticated %}
-                                <div class="position-absolute top-50 end-0 translate-middle-y me-3">
-                                    {% if product.is_published %}
-                                        <span class="badge bg-success">Опубликовано</span>
-                                    {% else %}
-                                        <span class="badge bg-warning">Черновик</span>
-                                    {% endif %}
-                                </div>
+                            <div class="position-absolute top-50 end-0 translate-middle-y me-3">
+                                {% if product.is_published %}
+                                <span class="badge bg-success">Опубликовано</span>
+                                {% else %}
+                                <span class="badge bg-warning">Черновик</span>
+                                {% endif %}
+                            </div>
                             {% endif %}
                         </div>
 
                         <!-- Предупреждение для черновиков -->
                         {% if not product.is_published and user.is_authenticated and product.author == user %}
-                            <div class="alert alert-warning m-2 py-2" role="alert">
-                                <small><i class="bi bi-exclamation-triangle"></i> Черновик, виден только вам</small>
-                            </div>
+                        <div class="alert alert-warning m-2 py-2" role="alert">
+                            <small><i class="bi bi-exclamation-triangle"></i> Черновик, виден только вам</small>
+                        </div>
                         {% endif %}
 
                         <!-- Изображение продукта -->
@@ -96,9 +102,9 @@
                                     <i class="bi bi-calendar"></i> {{ product.created_at|date:"d.m.Y" }}
                                 </p>
                                 {% if product.author %}
-                                    <p class="mb-1 text-muted small">
-                                        <i class="bi bi-person"></i> {{ product.author.username }}
-                                    </p>
+                                <p class="mb-1 text-muted small">
+                                    <i class="bi bi-person"></i> {{ product.author.username }}
+                                </p>
                                 {% endif %}
                             </div>
 
@@ -111,44 +117,52 @@
                             <div class="mt-auto pt-3">
                                 <!-- Основные кнопки -->
                                 <div class="btn-group w-100" role="group">
-                                    <a href="{% url 'catalog:product_detail' product.pk %}"
+                                    {% if product.id %}
+                                    <a href="{% url 'catalog:product_detail' product.id %}"
                                        class="btn btn-outline-primary">
                                         <i class="bi bi-eye"></i> Подробнее
                                     </a>
+                                    {% else %}
+                                    <button class="btn btn-outline-secondary" disabled>
+                                        <i class="bi bi-eye-slash"></i> Нет ID
+                                    </button>
+                                    {% endif %}
 
                                     {% if user.is_authenticated and product.author == user %}
-                                        <a href="{% url 'catalog:product_update' product.pk %}"
-                                           class="btn btn-outline-warning">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <a href="{% url 'catalog:product_delete' product.pk %}"
-                                           class="btn btn-outline-danger">
-                                            <i class="bi bi-trash"></i>
-                                        </a>
+                                    {% if product.id %}
+                                    <a href="{% url 'catalog:product_update' product.id %}"
+                                       class="btn btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{% url 'catalog:product_delete' product.id %}"
+                                       class="btn btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                    {% endif %}
                                     {% endif %}
                                 </div>
 
                                 <!-- Кнопки публикации для модераторов -->
-                                {% if user.is_authenticated %}
-                                    <div class="mt-2">
-                                        {% if product.is_published %}
-                                            <form method="post" action="{% url 'catalog:product_unpublish' product.pk %}"
-                                                  class="d-inline w-100">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-outline-secondary w-100 btn-sm">
-                                                    <i class="bi bi-x-circle"></i> Снять с публикации
-                                                </button>
-                                            </form>
-                                        {% else %}
-                                            <form method="post" action="{% url 'catalog:product_publish' product.pk %}"
-                                                  class="d-inline w-100">
-                                                {% csrf_token %}
-                                                <button type="submit" class="btn btn-outline-success w-100 btn-sm">
-                                                    <i class="bi bi-check-circle"></i> Опубликовать
-                                                </button>
-                                            </form>
-                                        {% endif %}
-                                    </div>
+                                {% if user.is_authenticated and product.id %}
+                                <div class="mt-2">
+                                    {% if product.is_published %}
+                                    <form method="post" action="{% url 'catalog:product_unpublish' product.id %}"
+                                          class="d-inline w-100">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-secondary w-100 btn-sm">
+                                            <i class="bi bi-x-circle"></i> Снять с публикации
+                                        </button>
+                                    </form>
+                                    {% else %}
+                                    <form method="post" action="{% url 'catalog:product_publish' product.id %}"
+                                          class="d-inline w-100">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-outline-success w-100 btn-sm">
+                                            <i class="bi bi-check-circle"></i> Опубликовать
+                                        </button>
+                                    </form>
+                                    {% endif %}
+                                </div>
                                 {% endif %}
                             </div>
                         </div>
@@ -187,17 +201,17 @@
 
                     <!-- Страницы вокруг текущей -->
                     {% for num in page_obj.paginator.page_range %}
-                        {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
-                            {% if page_obj.number == num %}
-                            <li class="page-item active" aria-current="page">
-                                <span class="page-link">{{ num }}</span>
-                            </li>
-                            {% else %}
-                            <li class="page-item">
-                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
-                            </li>
-                            {% endif %}
-                        {% endif %}
+                    {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active" aria-current="page">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
                     {% endfor %}
 
                     <!-- Кнопка "Вперед" -->
@@ -208,7 +222,8 @@
                         <span class="page-link">...</span>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">{{
+                            page_obj.paginator.num_pages }}</a>
                     </li>
                     {% endif %}
 
@@ -239,22 +254,30 @@
             <h3>Продукты не найдены</h3>
             <p class="lead">
                 {% if user.is_authenticated %}
-                    Создайте свой первый продукт!
+                Создайте свой первый продукт!
                 {% else %}
-                    Войдите в систему, чтобы создать продукты или увидеть больше.
+                Войдите в систему, чтобы создать продукты или увидеть больше.
                 {% endif %}
             </p>
             {% if user.is_authenticated %}
-                <a href="{% url 'catalog:product_create' %}" class="btn btn-success btn-lg mt-3">
-                    <i class="bi bi-plus-circle"></i> Создать первый продукт
-                </a>
+            <a href="{% url 'catalog:product_create' %}" class="btn btn-success btn-lg mt-3">
+                <i class="bi bi-plus-circle"></i> Создать первый продукт
+            </a>
             {% else %}
-                <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3">
-                    <i class="bi bi-box-arrow-in-right"></i> Войти
-                </a>
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3">
+                <i class="bi bi-box-arrow-in-right"></i> Войти
+            </a>
             {% endif %}
         </div>
         {% endif %}
     </div>
 </main>
+
+<!-- Индикатор источника данных -->
+{% if debug %}
+    <div style="position: fixed; bottom: 20px; right: 20px; padding: 8px 12px; background: {% if from_cache %}#4CAF50{% else %}#f44336{% endif %}; color: white; border-radius: 20px; font-size: 14px; font-weight: bold; z-index: 9999; opacity: 0.9;">
+        {% if from_cache %}⚡ КЭШ{% else %}📦 БД{% endif %}
+    </div>
+{% endif %}
+
 {% endblock %}
